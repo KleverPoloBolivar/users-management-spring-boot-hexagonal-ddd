@@ -28,9 +28,9 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
-@Profile("!postgres")
+@Profile("postgres")
 @RequiredArgsConstructor
-public class UserRepositoryMySQL
+public class UserRepositoryPostgres
     implements SaveUserPort,
         UpdateUserPort,
         GetUserByIdPort,
