@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
@@ -40,13 +42,16 @@ public class DataSourceSpringConfig {
   @Value(PROP_DB_SSL_MODE)
   private String dbSslMode;
 
-  @Bean
-  public DataSource dataSource() {
+    @Bean
+  public DataSource dataSource(final Environment environment) {
+    final boolean usePostgres = environment.acceptsProfiles(Profiles.of("postgres"));
+
     final DatabaseConfig config =
         new DatabaseConfig(dbHost, dbPort, dbName, dbUsername, dbPassword, dbSslMode);
 
     final HikariConfig hikariConfig = new HikariConfig();
-    hikariConfig.setJdbcUrl(config.buildJdbcUrl());
+    hikariConfig.setJdbcUrl(
+        usePostgres ? config.buildPostgresJdbcUrl() : config.buildJdbcUrl());
     hikariConfig.setUsername(config.username());
     hikariConfig.setPassword(config.password());
     hikariConfig.setMaximumPoolSize(10);
